@@ -20,9 +20,19 @@ const PORT = process.env.PORT || 5000;
 const redisClient = redis.createClient({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
-    password: process.env.REDIS_PASSWORD,
     legacyMode: true, // Required for compatibility with older Redis clients
-  });
+});
+
+redisClient.on('error', (err) => {
+    console.error('Redis Client Error:', err);
+});
+
+redisClient.on('connect', () => {
+    console.log('Redis Client Connected');
+});
+
+redisClient.connect().catch(console.error);
+
 const getAsync = promisify(redisClient.get).bind(redisClient);
 const setAsync = promisify(redisClient.setex).bind(redisClient);
 
@@ -156,27 +166,26 @@ app.get("/api/analytics/overall", authenticateJWT, async (req, res) => {
 
 app.get("/api/shorten/:alias", async (req, res) => {
     const { alias } = req.params;
-    const url = await ShortUrl.findOne({ alias });
-    if (!url) return res.status(404).json({ message: "Short URL not found" });
-    
+    let url = await getAsync(alias);
+    if (!url) {
+      url = await ShortUrl.findOne({ alias });
+      if (!url) return res.status(404).json({ message: "Short URL not found" });
+      await setAsync(alias, 3600, JSON.stringify(url));
+    } else {
+      url = JSON.parse(url);
+    }
+  
     url.clicks += 1;
     url.analytics.push({
       timestamp: new Date(),
       ipAddress: req.clientIp,
       userAgent: req.headers["user-agent"],
     });
-    
-    await url.save();
-    
-    // Make sure the longUrl has a protocol
-    let longUrl = url.longUrl;
-    if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
-      longUrl = 'https://' + longUrl;
-    }
-    
-    console.log(longUrl);
+    await ShortUrl.updateOne({ alias }, { $set: { clicks: url.clicks }, $push: { analytics: url.analytics } });
+  
+    let longUrl = url.longUrl.startsWith("http") ? url.longUrl : `https://${url.longUrl}`;
     res.redirect(longUrl);
-  })
+  });
 
   app.get("/api/analytics/:alias", async (req, res) => {
     const { alias } = req.params;
