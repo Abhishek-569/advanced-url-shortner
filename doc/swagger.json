@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "contact": {},
+    "description": "# Build an Advanced URL Shortener app with Comprehensive Analytics, Custom Aliases, and Rate Limiting",
+    "title": "Advanced URL Shortener app",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/api/analytics/exam": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "The `GET` request retrieves analytics data for an exam from the specified API endpoint.\n\n### Response\n\nThe response will be in JSON format with the following schema:\n\n``` json\n{\n    \"type\": \"object\",\n    \"properties\": {\n        \"totalClicks\": {\n            \"type\": \"integer\"\n        },\n        \"analytics\": {\n            \"type\": \"array\",\n            \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"timestamp\": {\n                        \"type\": \"string\"\n                    },\n                    \"ipAddress\": {\n                        \"type\": \"string\"\n                    },\n                    \"userAgent\": {\n                        \"type\": \"string\"\n                    },\n                    \"_id\": {\n                        \"type\": \"string\"\n                    }\n                }\n            }\n        }\n    }\n}\n}\n\n ```",
+        "operationId": "apiAnalyticsAlias",
+        "summary": "/api/analytics/{alias}"
+      }
+    },
+    "/api/analytics/overall": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "The `GET` request retrieves the overall analytics data from the specified endpoint. The response is in JSON format and includes the following fields:\n\n- `totalUrls` (number): The total number of URLs.\n    \n- `totalClicks` (number): The total number of clicks.\n    \n- `uniqueUsers` (number): The total number of unique users.",
+        "operationId": "apiAnalyticsOverall",
+        "summary": "/api/analytics/overall"
+      }
+    },
+    "/api/analytics/topic/demo": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "The endpoint retrieves analytics data for a specific topic. The response is in JSON format and has the following schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"totalClicks\": {\n      \"type\": \"integer\"\n    },\n    \"uniqueUsers\": {\n      \"type\": \"integer\"\n    },\n    \"urls\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"_id\": {\n            \"type\": \"string\"\n          },\n          \"longUrl\": {\n            \"type\": \"string\"\n          },\n          \"shortUrl\": {\n            \"type\": \"string\"\n          },\n          \"alias\": {\n            \"type\": \"string\"\n          },\n          \"topic\": {\n            \"type\": \"string\"\n          },\n          \"clicks\": {\n            \"type\": \"integer\"\n          },\n          \"createdAt\": {\n            \"type\": \"string\"\n          },\n          \"analytics\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"timestamp\": {\n                  \"type\": \"string\"\n                },\n                \"ipAddress\": {\n                  \"type\": \"string\"\n                },\n                \"userAgent\": {\n                  \"type\": \"string\"\n                },\n                \"_id\": {\n                  \"type\": \"string\"\n                }\n              }\n            }\n          },\n          \"__v\": {\n            \"type\": \"integer\"\n          }\n        }\n      }\n    }\n  }\n}\n\n ```",
+        "operationId": "apiAnalyticsTopicTopic",
+        "summary": "/api/analytics/topic/:topic"
+      }
+    },
+    "/api/shorten": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "customAlias": {
+                  "example": "exam",
+                  "type": "string"
+                },
+                "longUrl": {
+                  "example": "http://example.com",
+                  "type": "string"
+                },
+                "topic": {
+                  "example": "demo",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "### Shorten URL\n\nThis endpoint allows the user to shorten a long URL.\n\n#### Request Body\n\n- `longUrl` (string): The long URL that needs to be shortened.\n    \n- `customAlias` (string): (Optional) Custom alias for the shortened URL.\n    \n- `topic` (string): (Optional) Topic or category for the shortened URL.\n    \n\n#### Response (application/json)\n\nThe response will be a JSON object with the following properties:\n\n- `shortUrl` (string): The shortened URL.\n    \n- `createdAt` (string): The timestamp when the shortened URL was created.\n    \n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"shortUrl\": {\n      \"type\": \"string\"\n    },\n    \"createdAt\": {\n      \"type\": \"string\"\n    }\n  }\n}\n\n ```",
+        "operationId": "apiShorten",
+        "summary": "api/shorten"
+      }
+    },
+    "/api/shorten/exam": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "The API endpoint sends an HTTP GET request to shorten the URL for the \"exam\" resource. The response returned is in the form of HTML content with a status code of 200. Below is the JSON schema representing the response:\n\n``` json\n{\n    \"type\": \"object\",\n    \"properties\": {\n        \"status\": {\n            \"type\": \"number\",\n            \"description\": \"The status code of the response\"\n        },\n        \"content-type\": {\n            \"type\": \"string\",\n            \"description\": \"The type of content in the response\"\n        },\n        \"html\": {\n            \"type\": \"string\",\n            \"description\": \"The HTML content returned by the API\"\n        }\n    }\n}\n\n ```",
+        "operationId": "apiShortenAlias",
+        "summary": "api/shorten/{alias}"
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "auth/google",
+        "operationId": "authGoogle",
+        "summary": "auth/google"
+      }
+    }
+  },
+  "tags": []
+}
