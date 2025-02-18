@@ -15,7 +15,7 @@ RUN npm ci --only=production
 COPY server.js ./
 COPY config/ ./config/
 COPY middlewares/ ./middlewares/
-COPY docs/ ./docs/
+COPY doc/ ./doc/
 COPY models/ ./models/
 COPY routes/ ./routes/
 
