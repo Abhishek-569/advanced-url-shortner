@@ -11,8 +11,13 @@ COPY package*.json ./
 # Clean install for production
 RUN npm ci --only=production
 
-# Copy source code
-COPY . .
+# Copy project files with proper structure
+COPY server.js ./
+COPY config/ ./config/
+COPY middlewares/ ./middlewares/
+COPY docs/ ./docs/
+COPY models/ ./models/
+COPY routes/ ./routes/
 
 # Set Node.js to run in production mode
 ENV NODE_ENV=production
