@@ -1,7 +1,7 @@
 const express = require("express");
 const ShortUrl = require("../models/ShortUrl");
 const authenticateJWT = require("../middlewares/auth");
-const limiter = require("../middlewares/ratelimiter");
+const limiter = require("../middlewares/rateLimiter");
 const { getAsync, setAsync } = require("../config/redis");
 const router = express.Router();
 
