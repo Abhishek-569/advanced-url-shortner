@@ -16,7 +16,8 @@
     "useragent": "^2.3.0"
   },
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node index.js"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
