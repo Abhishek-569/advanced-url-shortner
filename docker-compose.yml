@@ -1,54 +1,74 @@
-version: '3.8'
+
+version: "3.8"
+
 
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_URI:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_URI:-password}
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - app_network
+ mongoDB:
+   image: mongo
+   container_name: mongoDB
+   restart: unless-stopped
+   environment:
+     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+   networks:
+     - app_network
+   ports:
+     - "27017:27017"
+   healthcheck:
+     test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+     start_period: 40s
 
-  redis:
-    image: redis
-    container_name: redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    networks:
-      - app_network
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: node_backend
-    restart: unless-stopped
-    ports:
-      - "${PORT:-5000}:${PORT:-5000}"
-    environment:
-      - PORT=${PORT}
-      - MONGO_URI=mongodb://${MONGO_URI:-admin:password@mongodb:27017}
-      - SESSION_SECRET=${SESSION_SECRET}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - JWT_SECRET=${JWT_SECRET}
-      - REDIS_HOST=redis
-      - REDIS_PORT=${REDIS_PORT:-6379}
-    depends_on:
-      - mongodb
-      - redis
-    networks:
-      - app_network
+
+
+ redis:
+   image: redis
+   container_name: redis
+   restart: unless-stopped
+   networks:
+     - app_network
+   healthcheck:
+     test: ["CMD", "redis-cli", "ping"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+
+
+ backend:
+   build:
+     context: .
+     dockerfile: Dockerfile
+   container_name: node_backend
+   restart: unless-stopped
+   ports:
+     - "5000:5000"
+   environment:
+     - PORT=5000
+     - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:27017
+     - SESSION_SECRET=${SESSION_SECRET}
+     - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+     - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+     - JWT_SECRET=${JWT_SECRET}
+     - REDIS_HOST=${REDIS_HOST}
+     - REDIS_PORT=6379
+   depends_on:
+     mongoDB:
+       condition: service_healthy
+     redis:
+       condition: service_healthy
+   networks:
+     - app_network
+
 
 networks:
-  app_network:
-    driver: bridge
+ app_network:
+   external: true
+   name: app_network
+
 
 volumes:
-  mongodb_data:
-  redis_data:
+ mongodb_data:
+ redis_data:
